@@ -1,0 +1,29 @@
+{
+  "name":"三叔文字转图片工具 1.0",
+  "version": "1.0.0",
+  "main": "main.js",  "config": {
+  "forge": {
+    "electronPackagerConfig": {
+      "asar": true
+    }
+  }
+},
+  "scripts": {
+    "start": "electron .",
+    "package":"electron-packager . 三叔文字转图片 --platform=win32  --icon=./favicon.ico--arch=x64 --icon=computer.ico --out=./out --asar --app-version=1.0.0 --overwrite --ignore=node_modules",
+
+
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "electron-builder",
+    "dist-win": "electron-builder --win --ia32",
+    "dist-win64": "electron-builder --win --x64",
+    "dist-mac": "electron-builder --mac",
+    "dist-linux": "electron-builder --linux"
+  },
+
+  "dependencies": {
+    "electron-packager": "^12.2.0",
+    "electron": "~1.8.2"
+  }
+}

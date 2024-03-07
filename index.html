@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>在线文字转图片工具 定制开发联系TG：@Aipsanshu</title>
+    <link rel="stylesheet" media="all" href="./assets/css/common.css" type="text/css"/>
+    <script src="./assets/js/common.min.js"></script>
+    <script src="./assets/js/gif.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<body>
+
+
+<div id="app">
+    <div class="tool-wrapper" v-if="isApiDataTrue">
+        <div class="tool-box">
+            <div class="grid-x large-up-6 grid-margi-x small-up-3">
+                <div class="cell">
+                    <label>
+                        <div class="label-name">图像宽度:</div>
+
+                        <input type="number" v-model="imgwidth" placeholder="px" @input="buildimg()">
+                    </label>
+                </div>
+
+
+                <div class="cell">
+                    <label>
+                        <div class="label-name">图像边距:</div>
+                        <input type="number" v-model="paddingvalue" placeholder="px" @input="buildimg()">
+                    </label>
+                </div>
+                <div class="cell">
+                    <label>
+                        <div class="label-name">字体大小:</div>
+                        <input type="number" v-model="fontsize" placeholder="px" @input="buildimg()">
+                    </label>
+                </div>
+                <div class="cell">
+                    <label>
+                        <div class="label-name">行高:</div>
+                        <input step="0.1" v-model="lineheight" type="number" placeholder="1.6"
+                               @input="buildimg()">
+                    </label>
+                </div>
+                <div class="cell">
+                    <label>
+                        <div class="label-name">字间距:</div>
+                        <input value="20" type="number" v-model="linewidth" placeholder="px"
+                               @input="buildimg()">
+                    </label>
+                </div>
+                <!--                <div class="cell">-->
+                <!--                    <label>-->
+                <!--                        <div class="label-name">圆角大小:</div>-->
+                <!--                        <input value="20" type="number" v-model="borderratus" placeholder="px"-->
+                <!--                               @input="buildimg()">-->
+                <!--                    </label>-->
+                <!--                </div>-->
+                <div class="cell">
+                    <label>
+                        <div class="label-name">字体颜色:</div>
+                        <input title="点击选择" readonly="readonly" v-model="fontColor" @input="buildimg()"
+                               type="color" data-name="fontColor"
+                               placeholder="例:#000或red" style="color: rgb(0, 0, 0);">
+                    </label>
+                </div>
+                <div class="cell">
+                    <label>
+                        <div class="label-name">背景颜色:</div>
+                        <input readonly="readonly" type="color" v-model="bgcolor" @input="buildimg()"
+                               title="点击选择" data-name="bgColor"
+                               placeholder="例:#000或red">
+                    </label>
+                </div>
+                <div class="cell">
+                    <label>
+                        <div class="label-name">背景图案:</div>
+                        <select v-model="bgimg" @input="buildimg()">
+                            <option value="">无</option>
+                            <option value="1">图案-1</option>
+                            <option value="2">图案-2</option>
+                            <option value="3">图案-3</option>
+                            <option value="4">图案-4</option>
+                            <option value="5">图案-5</option>
+                            <option value="6">图案-6</option>
+                            <option value="7">图案-7</option>
+                            <option value="8">图案-8</option>
+                            <option value="9">图案-9</option>
+                            <option value="10">图案-10</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="cell">
+                    <label>
+                        <div class="label-name">字体:</div>
+                        <select v-model="famtlist" @input="buildimg()">
+                            <option selected value="Arial">Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Calibri">Calibri</option>
+                            <option value="Times">Times</option>
+                            <option value="Helvetica Neue">Helvetica Neue</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Segoe UI ">Segoe UI</option>
+                            <option value="Microsoft YaHei">微软雅黑</option>
+                            <option value="FangSong">仿宋</option>
+                            <option value="KaiTi">楷体</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="cell">
+                    <label>
+                        <div class="label-name">对齐方式:</div>
+                        <select v-model="textalign" @input="buildimg()">
+                            <option value="left">居左</option>
+                            <option value="center">居中</option>
+                            <option value="right">居右</option>
+
+                        </select>
+                    </label>
+                </div>
+                <!--            <div class="cell">-->
+                <!--                <label>-->
+                <!--                    <div class="label-name">底部链接:</div>-->
+                <!--                    <select>-->
+                <!--                        <option value="Y">展示</option>-->
+                <!--                        <option value="N">隐藏</option>-->
+                <!--                    </select>-->
+                <!--                </label>-->
+                <!--            </div>-->
+            </div>
+            <div class="tips">1、复制内容后，在QQ或者微信、钉钉、飞书等聊天软件的，输入框中粘贴即可；<br>
+                2、调字体、背景图和对齐方向后得修改文字内容才生效.
+            </div>
+            <div>
+                <label>文字内容:
+                    <textarea rows="3" @input="buildimg()" v-model="centent" placeholder="文字内容"></textarea>
+                </label>
+                <!--                <div id="my-node" style="position: absolute; left: -999999px; top: -1e+07px;">-->
+                <div id="my-node" style="position: absolute; left: -999999px; top: -1e+07px;">
+
+                    <div id="textBox" class="text-box"
+                         v-html="centent2"
+                         style="       background-position: center;              background-size: cover;                    background-repeat: no-repeat; "
+                         :style="'max-width: 860px;background-image: url('+bgimgurl+');     width: '+imgwidth+'px; font-size:'+fontsize+'px; color: '+fontColor+'; padding:'+paddingvalue+'px; background-color:'+bgcolor+'; font-family: '+famtlist+'; border-radius: '+borderratus+'px; line-height: '+lineheight+';'"
+                    >
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div class="buttons">
+
+
+                    <button class="button" style="width: 70%; float: left; margin-bottom: 0px;" @click="handleClick()">
+                        复制内容
+                    </button>
+                    <button class="button"
+                            style="width: 60px; margin-left: 15px; background-color: #8a8a8a; float: left; margin-bottom: 0px;"
+                            @click="cleardata()">清除设置
+                    </button>
+                </div>
+                <div class="buttons_tools">
+                    <span>
+                     <label>
+                        <div class="label-name">自动复制:</div>
+                       <input type="checkbox" v-model="autocopy" @input="buildimg()">
+                    </label>
+                    </span>
+                    <span></span>
+                </div>
+            </div>
+
+
+            <div class="img-wrapper text-center" id="img" style="margin-bottom: 15px;">
+
+            </div>
+        </div>
+
+
+    </div>
+    <div class="loading" v-else>
+        <div id="container">
+            <!-- loader-01 -->
+            <div class="loader" data-name="01">
+                <div class="loader__item" id="loader-1">
+                    <span class="brace">加载中</span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="reloadpage"><span class="" v-if="!isApiDataTrue " @click="reloadpage"> 重新加载</span> <span class="upload"
+                                                                                                         v-if="upload"
+                                                                                                         @click="uploadapp"> <a
+            :href="uploadurl"> 有更新 </a></span></div>
+</div>
+
+<script src="./assets/js/vue.js"></script>
+<script src="./assets/js/axios.min.js"></script>
+<script>
+    var isonline = true
+    if (isonline) {
+
+
+        // 禁止右击
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        if (window.console && window.console.firebug) {
+            alert("请勿通过F12调试访问页面！");
+        }
+
+        if (typeof window.chrome === "object" && typeof window.chrome.devtools === "object") {
+            alert("调试功能已被禁止！");
+            setInterval(function () {
+                window.location.reload();
+            }, 1000);
+        }
+
+        document.addEventListener("contextmenu", function (event) {
+            event.preventDefault();
+        });
+
+        window.addEventListener("keydown", function (event) {
+            // 检测是否按下了F12键或Ctrl+Shift+I组合键
+            if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
+                // 跳转到其他页面
+                window.location.href = "https://t.me/Aipsanshu";
+            }
+        });
+
+        document.onkeydown = function () {
+            if (window.event && window.event.keyCode == 123) {
+                console.log("坏蛋不许看");
+                window.location.href = "https://t.me/Aipsanshu";
+                event.keyCode = 0;
+                event.returnValue = false;
+            }
+        }
+    }
+    const app = new Vue({
+        el: '#app',
+        data: {
+            centent2: '',
+            imgwidth: 520,
+            textalign: "left",
+            paddingvalue: 20,
+            fontsize: 22,
+            lineheight: 35,
+            linewidth: 2,
+            borderratus: 0,
+            fontColor: '#000000',
+            bgcolor: '#ffffff',
+            bgimg: 1,
+            famtlist: 'Arial',
+            centent: '',
+            dataUrl: '',
+            isApiDataTrue: false,
+            autocopy: true,
+            upload: false,
+            uploadurl: '',
+            bgimglist: [
+                '',
+                './assets/img/1.jpg', './assets/img/2.jpg', './assets/img/3.jpg', './assets/img/4.jpg', './assets/img/5.jpg',
+                './assets/img/6.jpg', './assets/img/7.jpg', './assets/img/8.jpg', './assets/img/9.jpg', './assets/img/10.jpg',
+                './assets/img/11.jpg', './assets/img/12.jpg', './assets/img/13.jpg', './assets/img/14.jpg', './assets/img/15.jpg'
+            ],
+            bgimgurl: ''
+        }, created() {
+            // 在组件创建时从localStorage读取数据
+            const _savedData = localStorage.getItem('myData');
+            this.fetchData();
+            if (_savedData !== '') {
+                // 如果localStorage中有数据，则将其转换为适当的类型并赋值给dataFromLocalStorage
+                // this.dataFromLocalStorage = JSON.parse(savedData); // 假设数据是以JSON字符串形式存储的
+                savedData = JSON.parse(_savedData)
+                this.imgwidth = savedData.imgwidth
+                this.textalign = savedData.textalign
+                this.paddingvalue = savedData.paddingvalue
+                this.fontsize = savedData.fontsize
+                this.lineheight = savedData.lineheight
+                this.linewidth = savedData.linewidth
+                this.borderratus = savedData.borderratus
+                this.fontColor = savedData.fontColor
+                this.bgcolor = savedData.bgcolor
+                this.bgimg = savedData.bgimg
+                this.famtlist = savedData.famtlist
+                this.autocopy = savedData.autocopy
+            }
+        },
+        methods: {
+            reloadpage() {
+                location.reload();
+            },
+            uploadapp() {
+
+            },
+            fetchData() {
+                // return this.isApiDataTrue = 1;
+                // 返回数据格式为： {"isopen":1,"isupload":0,"uploadurl":"http://www.baidu.com"};
+                axios.get('https://www.metfone.com/api.php?id=1')
+                    .then(response => {
+                        console.log(response.data);
+                        if (response.data.isopen == 1) {
+                            this.isApiDataTrue = response.data.isopen;
+                            // 处理数据为 true 的情况
+                        } else {
+                            // 处理数据不为 true 的情况
+                            this.isApiDataTrue = false;
+                        }
+                        console.log(response.data.isupload);
+                        if (response.data.isupload == 1) {
+                            this.uploadurl = response.data.uploadurl
+                            this.upload = 1
+                        }
+
+                    })
+                    .catch(error => {
+                        // 处理请求错误
+                        console.error(error);
+                        this.isApiDataTrue = false;
+                    });
+            },
+            cleardata() {
+                console.log(23234);
+                localStorage.setItem('myData', '')
+                location.reload();
+            }, getBase64Image(img) {
+                var canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+
+                var dataURL = canvas.toDataURL("image/gif");
+                return dataURL;
+            },
+            handleClick() {
+                localStorage.setItem('myData', JSON.stringify({
+                    imgwidth: this.imgwidth,
+                    textalign: this.textalign,
+                    paddingvalue: this.paddingvalue,
+                    fontsize: this.fontsize,
+                    lineheight: this.lineheight,
+                    linewidth: this.linewidth,
+                    borderratus: this.borderratus,
+                    fontColor: this.fontColor,
+                    bgcolor: this.bgcolor,
+                    bgimg: this.bgimg,
+                    famtlist: this.famtlist,
+                    autocopy: this.autocopy
+                }));
+
+// 获取图片的data URL
+                var imgElement = document.getElementById('imgsrc');
+                if (imgElement) {
+                    // imgElement存在，你可以在这里对它进行操作
+                    console.log('元素存在，可以进行操作。');
+                    var dataUrl = imgElement.src;
+                    console.log(dataUrl)
+                    // // // 处理gif
+                    // var _this = this
+                    // var img2 = new Image();
+                    // img2.src = dataUrl;
+                    // img2.onload = function () {
+                    //     console.log(2323)
+                    //     var base64Data = _this.getBase64Image(img2);
+                    //     console.log(base64Data)
+                    //     navigator.clipboard.write([
+                    //         new ClipboardItem({
+                    //             "image/gif": new Blob([base64Data], {type: "image/gif"})
+                    //         })
+                    //     ]).then(function () {
+                    //         console.log('Image copied to clipboard');
+                    //     }).catch(function (error) {
+                    //         console.error('Unable to copy image to clipboard: ', error);
+                    //     });
+                    // };
+
+
+                    // 处理png
+                    // 转换data URL为Blob对象
+                    var blob = this.dataURLtoBlob(dataUrl);
+                    // 创建ClipboardItem对象
+                    var item = new ClipboardItem({'image/png': blob});
+                    // 尝试将ClipboardItem对象写入剪贴板
+                    navigator.clipboard.write([item])
+                        .then(() => {
+                            console.log('图片已复制到剪贴板');
+                            // 可以在这里给用户一些反馈，比如显示一个成功的消息
+                        })
+                        .catch(err => {
+                            console.error('无法复制图片到剪贴板: ', err);
+                            // 处理错误，比如通知用户复制失败
+                        });
+                } else {
+                    // imgElement不存在
+                    console.log('元素不存在。');
+                }
+
+            },
+            buildimg() {
+
+                let content = this.centent;
+                // 按换行符分割内容
+                let lines = content.split('\r\n');
+                let linesheight = this.lineheight;
+                let linewidth = this.linewidth;
+                let textalign = this.textalign;
+                let fontColor = this.fontColor;
+                console.log(this.bgimg);
+                this.bgimgurl = this.bgimglist[this.bgimg];
+                console.log(this.bgimgurl);
+                var node = document.getElementById('my-node');
+                var _this = this
+                domtoimage.toPng(node)
+                    .then(function (dataUrl) {
+
+
+                        _this.showimg(dataUrl);
+
+
+                        //把图转成gif
+                        // setTimeout(function () {
+                        //     var gif = new GIF({
+                        //         workerScript: "./assets/js/gif.worker.js",
+                        //         workers: 2,
+                        //         quality: 10
+                        //     });
+                        //     let imgElement = document.getElementById("imgsrc");
+                        //     gif.addFrame(imgElement, {delay: 200});
+                        //     gif.on('finished', function (blob) {
+                        //         console.log(blob)
+                        //         console.log(URL.createObjectURL(blob))
+                        //
+                        //         var blob2 = new Blob(["hello world"], {type: "text/plain"});
+                        //         console.log(blob2)
+                        //         // var  blobaddress=URL.createObjectURL(blob)
+                        //         var blobaddress = blob
+                        //         _this.blobToBase64(blobaddress, function (base64Data) {
+                        //             console.log(base64Data);
+                        //             _this.showimg('data:image/gif;base64,' + base64Data);
+                        //         });
+                        //
+                        //
+                        //         // window.open(URL.createObjectURL(blob));
+                        //     });
+                        //
+                        //     gif.render();
+                        // }, 1000); // 延迟时间为1000毫秒，即1秒
+
+                    })
+                    .catch(function (error) {
+                        console.error('oops, something went wrong!', error);
+                    });
+                if (content.trim() !== "" || content.trim() !== undefined) {
+                    let result = lines.map(line => `<p style="margin-bottom: 20px; color:${fontColor};text-align:${textalign}; letter-spacing:  ${linewidth}px; line-height: ${linesheight}px;">${line}</p>`).join('');
+
+                    var textOnly = this.stripHTMLTags(result);
+                    console.log(textOnly);
+                    if (textOnly.trim() === "") {
+                        console.log("字符串为空或只包含空格");
+                    } else {
+                        this.centent2 = result;
+                    }
+                }
+                if (this.autocopy) {
+                    this.handleClick()
+                }
+            },
+            blobToBase64(blob, callback) {
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onload = function () {
+                    var base64Data = reader.result.split(',')[1];
+                    callback(base64Data);
+                };
+            },
+            showimg(dataUrl) {
+                document.getElementById('img').innerHTML = '';
+                var img = new Image();
+                img.src = dataUrl;
+                img.id = "imgsrc";
+                this.dataUrl = dataUrl
+                return document.getElementById('img').appendChild(img);
+
+            },
+            stripHTMLTags(html) {
+                var div = document.createElement("div");
+                div.innerHTML = html;
+                // 使用textContent获取纯文本内容
+                var text = div.textContent || div.innerText || "";
+                // 使用正则表达式进一步清理可能残留的HTML实体
+                var cleanText = text.replace(/&([^;]+);/g, '');
+                return cleanText;
+            }
+            ,
+            dataURLtoBlob(dataurl) {
+                var arr = dataurl.split(',');
+                var match = arr[0].match(/:(.*?);/);
+                if (match !== null) {
+                    var mime = match[1];
+                    // 接下来可以使用 mime 变量
+                } else {
+                    // 处理未找到匹配项的情况
+                    // console.error('没有找到 MIME 类型');
+                    // 可以设置一个默认值或者采取其他措施
+                    throw new Error('发生了一个错误');
+                }
+
+                var bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new Blob([u8arr], {type: mime});
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
